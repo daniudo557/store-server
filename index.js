@@ -17,6 +17,21 @@ app.use(cors());
 
 app.use(express.json());
 
+function getDefaultImage(category) {
+  switch (category) {
+    case "men's clothing":
+      return "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+    case "men's clothing":
+      return "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+    case "jewelery":
+      return "https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+    case "electronics":
+      return "https://images.pexels.com/photos/306763/pexels-photo-306763.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
+    case "women's clothing":
+      return "https://images.pexels.com/photos/601316/pexels-photo-601316.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500";
+  }
+}
+
 app.get("/products", async (req, res) => {
   const product = await Product.findAll();
 
@@ -31,7 +46,11 @@ app.get("/products/:id", async (req, res) => {
 });
 
 app.post("/products", async (req, res) => {
-  const product = await Product.create(req.body);
+  const newProduct = {
+    ...req.body,
+    image: getDefaultImage(req.body.category),
+  };
+  const product = await Product.create(newProduct);
 
   res.send(product);
 });
