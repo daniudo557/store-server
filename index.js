@@ -1,3 +1,5 @@
+const products = require("./defaultProducts");
+
 const express = require("express");
 const sequelize = require("./database");
 const cors = require("cors");
@@ -5,7 +7,10 @@ const Product = require("./Product");
 
 sequelize
   .sync({ force: true })
-  .then(() => console.log("Database created successfully"));
+  .then(() => console.log("Database created successfully"))
+  .then(() => {
+    Product.bulkCreate(products);
+  });
 const app = express();
 
 app.use(cors());
