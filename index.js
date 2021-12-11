@@ -1,7 +1,7 @@
 const express = require("express");
 const sequelize = require("./database");
 const cors = require("cors");
-const Todo = require("./Todo");
+const Product = require("./Product");
 
 sequelize
   .sync({ force: true })
@@ -12,44 +12,46 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get("/todo", async (req, res) => {
-  const todo = await Todo.findAll();
+app.get("/products", async (req, res) => {
+  const product = await Product.findAll();
 
-  res.send(todo);
+  res.send(product);
 });
 
-app.get("/todo/:id", async (req, res) => {
+app.get("/products/:id", async (req, res) => {
   const { id } = req.params;
-  const todo = await Todo.findOne({ where: { id: id } });
+  const product = await Product.findOne({ where: { id: id } });
 
-  res.send(todo);
+  res.send(product);
 });
 
-app.post("/todo", async (req, res) => {
-  const todo = await Todo.create(req.body);
+app.post("/products", async (req, res) => {
+  const product = await Product.create(req.body);
 
-  res.send(todo);
+  res.send(product);
 });
 
-app.put("/todo/:id", async (req, res) => {
+app.put("/products/:id", async (req, res) => {
   const { id } = req.params;
-  const todo = await Todo.findOne({ where: { id } });
+  const product = await Product.findOne({ where: { id } });
 
-  todo.title = req.body.title;
-  todo.description = req.body.description;
-  todo.status = req.body.status;
+  product.title = req.body.title;
+  product.price = req.body.price;
+  product.description = req.body.description;
+  product.category = req.body.category;
+  product.rating = req.body.rating;
 
-  await todo.save();
+  await product.save();
 
-  res.send(todo);
+  res.send(product);
 });
 
-app.delete("/todo/:id", async (req, res) => {
+app.delete("/products/:id", async (req, res) => {
   const { id } = req.params;
 
-  await Todo.destroy({ where: { id } });
+  await Product.destroy({ where: { id } });
 
-  res.send("Todo deleted successfully");
+  res.send("Product deleted successfully");
 });
 
 app.listen(3001, () => {

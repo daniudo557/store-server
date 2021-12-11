@@ -1,25 +1,33 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("./database");
 
-class Todo extends Model {}
+class Product extends Model {}
 
-Todo.init(
+Product.init(
   {
     title: {
       type: DataTypes.STRING,
     },
+    price: {
+      type: DataTypes.FLOAT,
+    },
     description: {
       type: DataTypes.STRING,
     },
-    status: {
+    category: {
       type: DataTypes.STRING,
-      defaultValue: "PENDING",
+    },
+    image: {
+      type: DataTypes.STRING,
+    },
+    rating: {
+      type: DataTypes.FLOAT,
     },
   },
   {
     sequelize,
-    modelName: "todo",
+    modelName: "product",
   }
 );
 
-module.exports = Todo;
+module.exports = Product;
