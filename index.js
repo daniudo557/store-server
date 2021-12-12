@@ -4,6 +4,17 @@ const express = require("express");
 const sequelize = require("./database");
 const cors = require("cors");
 const Product = require("./Product");
+const User = require("./User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const authConfig = require("./config/auth");
+
+const generateToken = (params = {}) => {
+  return jwt.sign(params, authConfig.secret, {
+    expiresIn: 1814400,
+  });
+};
 
 sequelize
   .sync({ force: true })
@@ -31,6 +42,62 @@ function getDefaultImage(category) {
       return "https://images.pexels.com/photos/601316/pexels-photo-601316.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500";
   }
 }
+
+app.post("/user-register", async (req, res) => {
+  const { userName, email } = req.body;
+
+  try {
+    const isValidEmail = /^[^@\s]+@[^@\s.]+.[^@.\s]+(.[a-z]+)?$/.test(email);
+
+    if (!isValidEmail) {
+      return res.status(400).send({ error: "Email not valid" });
+    }
+
+    if (await User.findOne({ email })) {
+      return res.status(400).send({ error: "User already exists" });
+    }
+
+    if (await User.findOne({ userName })) {
+      return res.status(400).send({ error: "User already exists" });
+    }
+
+    const token = crypto.randomBytes(20).toString("hex");
+    const hash = await bcrypt.hashSync(req.body.password, 10);
+
+    const user = await User.create({ ...req.body, password: hash, token });
+
+    // Prevent to show this information on response
+    user.password = undefined;
+    user.token = undefined;
+    user.role = undefined;
+
+    return res.send({ user });
+  } catch (err) {
+    return res.status(400).send({ error: "Registration failed" });
+  }
+});
+
+app.post("/authenticate", async (req, res) => {
+  const { userName, password } = req.body;
+  try {
+    const user = await User.findOne({ where: { userName } });
+
+    if (!user) return res.status(400).send({ error: "User not found" });
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      return res.status(400).send({ error: "Invalid password" });
+    }
+
+    user.password = undefined;
+
+    res.send({
+      user,
+      token: generateToken({ id: user.id }),
+    });
+  } catch (err) {
+    return res.status(400).send({ error: "Cannot login. Try again" });
+  }
+});
 
 app.get("/products", async (req, res) => {
   const product = await Product.findAll();
