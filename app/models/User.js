@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("./database");
+const sequelize = require("../../database");
 
 class Product extends Model {}
 
@@ -19,9 +19,6 @@ Product.init(
     },
     role: {
       type: DataTypes.NUMBER,
-    },
-    token: {
-      type: DataTypes.STRING,
     },
   },
   {
