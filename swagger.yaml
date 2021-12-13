@@ -1,9 +1,8 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: Based on "Basic Auth Example"
-  description: >
-    An example for how to use Auth with Swagger.
+  title: Store server
+  description: "Sample store server for study purposes"
 
 host: localhost:3001
 schemes:
