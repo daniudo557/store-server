@@ -10,8 +10,6 @@ function getDefaultImage(category) {
   switch (category) {
     case "men's clothing":
       return "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
-    case "men's clothing":
-      return "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
     case "jewelery":
       return "https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260";
     case "electronics":
@@ -30,9 +28,13 @@ router.use(cors());
 router.use(express.json());
 
 router.get("/", async (req, res) => {
-  const product = await Product.findAll();
+  try {
+    const product = await Product.findAll();
 
-  res.send(product);
+    res.send(product);
+  } catch (err) {
+    return res.status(400).send({ error: "Cannot find products" });
+  }
 });
 
 router.get("/:id", async (req, res) => {
@@ -53,7 +55,7 @@ router.post("/", async (req, res) => {
     const superUser = user.role === 1;
 
     if (!superUser) {
-      return res.status(400).send({ error: "User cannot create product" });
+      return res.status(401).send({ error: "User cannot create product" });
     }
 
     const newProduct = {
@@ -62,7 +64,7 @@ router.post("/", async (req, res) => {
     };
     const product = await Product.create(newProduct);
 
-    res.send(product);
+    res.status(201).send(product);
   } catch (err) {
     return res.status(400).send({ error: "Cannot create product" });
   }
@@ -77,7 +79,7 @@ router.put("/:id", async (req, res) => {
     const superUser = user.role === 1;
 
     if (!superUser) {
-      return res.status(400).send({ error: "User cannot update product" });
+      return res.status(401).send({ error: "User cannot update product" });
     }
 
     const product = await Product.findOne({ where: { id } });
@@ -105,7 +107,7 @@ router.delete("/:id", async (req, res) => {
     const superUser = user.role === 1;
 
     if (!superUser) {
-      return res.status(400).send({ error: "User cannot delete product" });
+      return res.status(401).send({ error: "User cannot delete product" });
     }
 
     await Product.destroy({ where: { id } });
