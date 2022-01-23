@@ -1,6 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 
+const YAML = require("yamljs");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = YAML.load("./swagger.yaml");
+
 const sequelize = require("./database");
 
 const products = require("./mocks/productsMock");
@@ -17,6 +21,8 @@ sequelize.sync({ force: true }).then(() => {
 const app = express();
 
 app.use(cors());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json());
 
